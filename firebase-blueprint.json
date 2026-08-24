@@ -1,0 +1,88 @@
+{
+  "entities": {
+    "users": {
+      "title": "User Profiles & Loyalty",
+      "description": "Customer profiles containing rewards, seed balances, and preferences",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "seedPoints": { "type": "number" },
+        "cupsPurchased": { "type": "number" },
+        "favoriteProductIds": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["userId"]
+    },
+    "orders": {
+      "title": "Placed Beverage & Bakery Orders",
+      "description": "Orders placed by customers for pickup or delivery",
+      "type": "object",
+      "properties": {
+        "orderNumber": { "type": "string" },
+        "userId": { "type": "string" },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "productId": { "type": "string" },
+              "name": { "type": "string" },
+              "basePrice": { "type": "number" },
+              "price": { "type": "number" },
+              "size": { "type": "string" },
+              "milk": { "type": "string" },
+              "notes": { "type": "string" },
+              "quantity": { "type": "number" },
+              "image": { "type": "string" }
+            }
+          }
+        },
+        "subtotal": { "type": "number" },
+        "tax": { "type": "number" },
+        "total": { "type": "number" },
+        "orderType": { "type": "string" },
+        "deliveryAddress": { "type": "string" },
+        "location": {
+          "type": "object",
+          "properties": {
+            "id": { "type": "string" },
+            "name": { "type": "string" },
+            "address": { "type": "string" }
+          }
+        },
+        "paymentMethod": {
+          "type": "object",
+          "properties": {
+            "id": { "type": "string" },
+            "type": { "type": "string" },
+            "title": { "type": "string" },
+            "subtitle": { "type": "string" }
+          }
+        },
+        "status": { "type": "string", "enum": ["Received", "Brewing", "Ready", "Completed", "Cancelled"] },
+        "estimatedPickupTime": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "timestamp": { "type": "number" }
+      },
+      "required": ["orderNumber", "items", "total", "status"]
+    },
+    "liveCart": {
+      "title": "Synced User Cart",
+      "description": "Active shopping cart items synced across devices for the user",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "items": { "type": "array" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["userId", "items"]
+    }
+  }
+}

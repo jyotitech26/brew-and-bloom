@@ -1,9 +1,15 @@
 import React, { useState, useMemo } from 'react';
-import { ProductItem } from '../types';
+import { ProductItem, FestivalPromotion } from '../types';
 import { BotanicalDivider } from './BotanicalDivider';
+import { FestivalPromoBanner } from './FestivalPromoBanner';
 
 interface HomeScreenProps {
   products: ProductItem[];
+  promotions: FestivalPromotion[];
+  activePromo: FestivalPromotion;
+  onSelectPromo: (promo: FestivalPromotion) => void;
+  onApplyPromoCode: (code: string) => void;
+  appliedPromoCode?: string;
   onSelectProduct: (product: ProductItem) => void;
   onQuickAdd: (product: ProductItem) => void;
   onToggleFavorite: (productId: string) => void;
@@ -12,6 +18,11 @@ interface HomeScreenProps {
 
 export const HomeScreen: React.FC<HomeScreenProps> = ({
   products,
+  promotions,
+  activePromo,
+  onSelectPromo,
+  onApplyPromoCode,
+  appliedPromoCode,
   onSelectProduct,
   onQuickAdd,
   onToggleFavorite,
@@ -38,6 +49,15 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
 
   return (
     <main className="max-w-[1200px] mx-auto px-4 sm:px-8 pt-6 pb-28">
+      {/* Interactive Festival Promo Showcase */}
+      <FestivalPromoBanner
+        promotions={promotions}
+        activePromo={activePromo}
+        onSelectPromo={onSelectPromo}
+        onApplyPromoCode={onApplyPromoCode}
+        appliedPromoCode={appliedPromoCode}
+      />
+
       {/* Hero Greeting Section */}
       <section className="mb-8">
         <h2 className="font-literata text-2xl sm:text-3xl lg:text-4xl font-bold text-[#271310] mb-1">
@@ -56,7 +76,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search for your favorite brew..."
+            placeholder="Search for your favorite brew or festival specials..."
             className="w-full bg-[#efeeea] rounded-full py-3.5 pl-12 pr-10 text-[#1b1c1a] placeholder:text-[#827472] border border-transparent focus:border-[#827472] focus:bg-[#ffffff] outline-none transition-all text-sm sm:text-base font-jakarta"
           />
           {searchQuery && (
@@ -98,7 +118,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         <div className="flex justify-between items-end mb-6">
           <div>
             <h3 className="font-literata text-2xl font-bold text-[#271310]">
-              {selectedCategory === 'All' ? 'Featured Brews' : selectedCategory}
+              {selectedCategory === 'All' ? 'Featured Brews & Festival Specials' : selectedCategory}
             </h3>
             <p className="text-xs text-[#655d5a] font-jakarta">Handcrafted with organic botanical ingredients</p>
           </div>
@@ -139,10 +159,14 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {filteredProducts.map((product) => {
               const isFav = favoriteIds.includes(product.id);
+              const isFestivalFeatured = activePromo.featuredDrinkIds?.includes(product.id);
+
               return (
                 <div
                   key={product.id}
-                  className="group relative rounded-2xl overflow-hidden bg-[#f5f3ef] border border-[#efeeea] shadow-[0_4px_16px_rgba(62,39,35,0.04)] hover:shadow-[0_8px_24px_rgba(62,39,35,0.08)] hover:-translate-y-1 transition-all duration-300 p-4 sm:p-5 flex flex-col sm:flex-row gap-5 cursor-pointer"
+                  className={`group relative rounded-2xl overflow-hidden bg-[#f5f3ef] border shadow-[0_4px_16px_rgba(62,39,35,0.04)] hover:shadow-[0_8px_24px_rgba(62,39,35,0.08)] hover:-translate-y-1 transition-all duration-300 p-4 sm:p-5 flex flex-col sm:flex-row gap-5 cursor-pointer ${
+                    isFestivalFeatured ? 'border-[#ba1a1a]/30 ring-1 ring-[#ba1a1a]/20' : 'border-[#efeeea]'
+                  }`}
                   onClick={() => onSelectProduct(product)}
                 >
                   {/* Card Thumbnail Image */}
@@ -176,6 +200,14 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                     <span className="absolute bottom-2 left-2 bg-[#271310]/80 backdrop-blur-xs text-white text-[10px] font-semibold px-2.5 py-0.5 rounded-full font-jakarta tracking-wide">
                       {product.category}
                     </span>
+
+                    {/* Festival Special Badge */}
+                    {isFestivalFeatured && (
+                      <span className="absolute top-2 left-2 bg-emerald-700 text-emerald-50 text-[10px] font-bold px-2 py-0.5 rounded-full font-jakarta shadow-xs flex items-center gap-1 border border-emerald-500/40">
+                        <span className="material-symbols-outlined text-[12px]">celebration</span>
+                        Festive
+                      </span>
+                    )}
                   </div>
 
                   {/* Card Content Details */}
@@ -194,9 +226,16 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                             product.name
                           )}
                         </h4>
-                        <span className="font-literata text-lg font-semibold text-[#655d5a] whitespace-nowrap">
-                          ${product.price.toFixed(2)}
-                        </span>
+                        <div className="text-right">
+                          <span className="font-literata text-lg font-semibold text-[#655d5a] whitespace-nowrap">
+                            ${product.price.toFixed(2)}
+                          </span>
+                          {isFestivalFeatured && (
+                            <p className="text-[10px] text-emerald-700 font-bold font-jakarta">
+                              -${(product.price * (activePromo.discountPercent / 100)).toFixed(2)} w/ {activePromo.promoCode}
+                            </p>
+                          )}
+                        </div>
                       </div>
                       <p className="font-jakarta text-xs sm:text-sm text-[#504442] line-clamp-2 leading-relaxed mb-4">
                         {product.subtitle || product.description}
@@ -236,3 +275,4 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
     </main>
   );
 };
+

@@ -65,11 +65,36 @@ export interface PaymentMethod {
   icon: string;
 }
 
+export interface FestivalPromotion {
+  id: string;
+  name: string;
+  themeTitle: string;
+  tagline: string;
+  promoCode: string;
+  discountPercent: number;
+  icon: string;
+  badge: string;
+  themeColor: {
+    bg: string;
+    border: string;
+    text: string;
+    badgeBg: string;
+    badgeText: string;
+    accent: string;
+  };
+  featuredDrinkIds: string[];
+  bannerImage: string;
+  expiryNote: string;
+  isActive: boolean;
+}
+
 export interface PlacedOrder {
   id: string;
   orderNumber: string;
   items: CartItem[];
   subtotal: number;
+  discount?: number;
+  promoCode?: string;
   tax: number;
   total: number;
   orderType: 'Pickup' | 'Delivery';

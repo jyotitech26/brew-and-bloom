@@ -4,8 +4,8 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { ProductItem, CartItem, PlacedOrder } from './types';
-import { PRODUCTS, INITIAL_CART_ITEMS, PICKUP_LOCATIONS, PAYMENT_METHODS } from './data/mockData';
+import { ProductItem, CartItem, PlacedOrder, FestivalPromotion } from './types';
+import { PRODUCTS, INITIAL_CART_ITEMS, PICKUP_LOCATIONS, PAYMENT_METHODS, FESTIVAL_PROMOTIONS } from './data/mockData';
 import { TopAppBar } from './components/TopAppBar';
 import { BottomNavBar, NavigationTab } from './components/BottomNavBar';
 import { HomeScreen } from './components/HomeScreen';
@@ -16,6 +16,13 @@ import { RewardsScreen } from './components/RewardsScreen';
 import { ProfileScreen } from './components/ProfileScreen';
 import { OrderSuccessModal } from './components/OrderSuccessModal';
 import { BrandStoryModal } from './components/BrandStoryModal';
+import {
+  initAuth,
+  saveOrderToFirestore,
+  subscribeToOrders,
+  syncUserProfile,
+  AppUser,
+} from './lib/databaseService';
 
 export default function App() {
   // Navigation & View State
@@ -23,6 +30,13 @@ export default function App() {
   const [selectedProduct, setSelectedProduct] = useState<ProductItem | null>(null);
   const [isCheckoutView, setIsCheckoutView] = useState<boolean>(false);
   const [isBrandStoryOpen, setIsBrandStoryOpen] = useState<boolean>(false);
+  const [currentUser, setCurrentUser] = useState<AppUser | null>(null);
+  const [isCloudConnected, setIsCloudConnected] = useState<boolean>(false);
+
+  // Festival Promotions State
+  const [promotions] = useState<FestivalPromotion[]>(FESTIVAL_PROMOTIONS);
+  const [activePromo, setActivePromo] = useState<FestivalPromotion>(FESTIVAL_PROMOTIONS[0]);
+  const [appliedPromoCode, setAppliedPromoCode] = useState<string>('EIDMUBARAK');
 
   // Cart & Order State with Local Storage fallback
   const [cartItems, setCartItems] = useState<CartItem[]>(() => {
@@ -94,6 +108,29 @@ export default function App() {
 
   const [lastPlacedOrder, setLastPlacedOrder] = useState<PlacedOrder | null>(null);
 
+  // Initialize Firebase Auth and Realtime sync
+  useEffect(() => {
+    const unsubscribeAuth = initAuth((user) => {
+      setCurrentUser(user);
+      setIsCloudConnected(true);
+
+      // Listen for real-time orders in Cloud Firestore
+      const unsubscribeOrders = subscribeToOrders((cloudOrders) => {
+        if (cloudOrders.length > 0) {
+          setOrderHistory(cloudOrders);
+        }
+      });
+
+      return () => {
+        unsubscribeOrders();
+      };
+    });
+
+    return () => {
+      unsubscribeAuth();
+    };
+  }, []);
+
   // Sync to localStorage
   useEffect(() => {
     try {
@@ -106,10 +143,13 @@ export default function App() {
   useEffect(() => {
     try {
       localStorage.setItem('brew_bloom_favs', JSON.stringify(favoriteIds));
+      if (currentUser) {
+        syncUserProfile(currentUser.uid, { favoriteProductIds: favoriteIds });
+      }
     } catch (e) {
       console.error(e);
     }
-  }, [favoriteIds]);
+  }, [favoriteIds, currentUser]);
 
   useEffect(() => {
     try {
@@ -152,9 +192,9 @@ export default function App() {
       name: product.name,
       basePrice: product.price,
       price: product.price,
-      size: 'Medium',
+      size: product.sizes?.[0]?.name || 'Medium',
       milk: product.milks?.[0]?.name || undefined,
-      notes: product.milks?.[0]?.name ? `${product.milks[0].name}` : 'Medium size',
+      notes: product.milks?.[0]?.name ? `${product.milks[0].name}` : 'Regular order',
       quantity: 1,
       image: product.image,
     });
@@ -186,11 +226,19 @@ export default function App() {
     );
   };
 
-  const handleOrderCompleted = (order: PlacedOrder) => {
+  const handleOrderCompleted = async (order: PlacedOrder) => {
+    // Update local state immediately for snappy UI
     setOrderHistory([order, ...orderHistory]);
     setCartItems([]);
     setIsCheckoutView(false);
     setLastPlacedOrder(order);
+
+    // Save directly to Firebase Firestore Cloud Database
+    try {
+      await saveOrderToFirestore(order, currentUser?.uid);
+    } catch (err) {
+      console.error('Failed to sync order to cloud:', err);
+    }
   };
 
   const handleReorder = (order: PlacedOrder) => {
@@ -207,6 +255,7 @@ export default function App() {
       {!isCheckoutView && !selectedProduct && (
         <TopAppBar
           cartCount={totalCartCount}
+          isCloudConnected={isCloudConnected}
           onOpenCart={() => {
             setActiveTab('order');
             setSelectedProduct(null);
@@ -236,6 +285,7 @@ export default function App() {
           /* Checkout Screen (Image 7) */
           <CheckoutScreen
             cartItems={cartItems}
+            initialPromoCode={appliedPromoCode}
             onBack={() => setIsCheckoutView(false)}
             onOrderCompleted={handleOrderCompleted}
           />
@@ -243,6 +293,14 @@ export default function App() {
           /* Home Screen (Image 5) */
           <HomeScreen
             products={PRODUCTS}
+            promotions={promotions}
+            activePromo={activePromo}
+            onSelectPromo={(promo) => {
+              setActivePromo(promo);
+              setAppliedPromoCode(promo.promoCode);
+            }}
+            onApplyPromoCode={(code) => setAppliedPromoCode(code)}
+            appliedPromoCode={appliedPromoCode}
             onSelectProduct={(p) => setSelectedProduct(p)}
             onQuickAdd={handleQuickAdd}
             onToggleFavorite={handleToggleFavorite}
@@ -252,6 +310,8 @@ export default function App() {
           /* Cart & Order Summary Screen (Image 3) */
           <CartScreen
             cartItems={cartItems}
+            activePromo={activePromo}
+            appliedPromoCode={appliedPromoCode}
             onUpdateQuantity={handleUpdateQuantity}
             onRemoveItem={handleRemoveCartItem}
             onProceedToCheckout={() => setIsCheckoutView(true)}

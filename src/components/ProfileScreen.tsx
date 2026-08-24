@@ -38,15 +38,15 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
           <div className="flex flex-wrap gap-4 mt-3 justify-center sm:justify-start text-xs text-[#655d5a] font-jakarta">
             <span className="flex items-center gap-1">
               <span className="material-symbols-outlined text-sm text-[#271310]">coffee</span>
-              28 Brews Ordered
+              {orderHistory.length} Orders in Cloud
             </span>
             <span className="flex items-center gap-1">
               <span className="material-symbols-outlined text-sm text-[#271310]">eco</span>
-              140 Bloom Seeds
+              {orderHistory.length * 15 + 85} Bloom Seeds
             </span>
             <span className="flex items-center gap-1">
-              <span className="material-symbols-outlined text-sm text-[#271310]">location_on</span>
-              Downtown Sanctuary
+              <span className="material-symbols-outlined text-sm text-[#271310]">cloud_done</span>
+              Firestore Cloud Synced
             </span>
           </div>
         </div>
@@ -88,13 +88,19 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                 className="bg-white rounded-2xl p-5 border border-[#efeeea] shadow-[0_2px_8px_rgba(62,39,35,0.03)] flex flex-col sm:flex-row sm:items-center justify-between gap-4"
               >
                 <div className="space-y-1">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <span className="font-literata text-base font-bold text-[#271310]">
                       {order.orderNumber}
                     </span>
                     <span className="text-xs bg-[#efeeea] text-[#655d5a] font-semibold px-2.5 py-0.5 rounded-full font-jakarta">
                       {order.orderType} • {order.status}
                     </span>
+                    {order.promoCode && (
+                      <span className="text-[11px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full font-mono flex items-center gap-1 border border-emerald-300">
+                        <span className="material-symbols-outlined text-xs">local_offer</span>
+                        {order.promoCode} (-${order.discount?.toFixed(2) || '0.00'})
+                      </span>
+                    )}
                   </div>
                   <p className="text-xs text-[#504442] font-jakarta">
                     {order.items.map((it) => `${it.quantity}x ${it.name}`).join(', ')}

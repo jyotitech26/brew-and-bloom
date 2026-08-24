@@ -1,4 +1,4 @@
-import { ProductItem, PickupLocation, PaymentMethod, RewardItem } from '../types';
+import { ProductItem, PickupLocation, PaymentMethod, RewardItem, FestivalPromotion } from '../types';
 
 export const HONEY_LATTE_HERO_IMAGE = "https://lh3.googleusercontent.com/aida-public/AB6AXuA3U1BTmMfZ9R39k44UqEFkMPxXpmV0MxvmoDwAZ0V9qjp0b17KY9NPC6SdLpO36B95qAwY5n6MjCnQOh0JZTeyW-0KvBVrvLaVHHjuv4l_SeUbRo7mZJF4oFBU9TVwbSA-_2ROoG6zWBfL4mmORfrMbW6RzxizSMH2B7DXTBLdx6cWF8tvtBUornnUJxOzQkDmgWYO1RUwmv4Xsru1qGU2DNr1jCz1o4hMDHgKGaaLjBeV6ASTJAtY";
 export const HONEY_LATTE_CARD_IMAGE = "https://lh3.googleusercontent.com/aida-public/AB6AXuCMge3_Z3Ek7AxftNrIqbQbPdUTEzydlhurrM85lyssetZ5aS6iF0DtIYcFw0keMlXK0i8732nSqHKUsS9Qq-xScv-to5kSfDY6PH00GJilnBPFONpG-VpiMUbbTYfDStjJjgYHJyDtKkDp6j2ht8EDna-ND9xptocXROGpeChc9Vcz_KRr1zgp1zt5s0w2IE09VS3MRn5DxNabXnSJltJ7_oDER8iM5pmfuPLO7Qz0JqZIbMwOd9NO";
@@ -523,3 +523,95 @@ export const REWARDS_DATA: RewardItem[] = [
     claimed: false,
   },
 ];
+
+export const FESTIVAL_PROMOTIONS: FestivalPromotion[] = [
+  {
+    id: 'fest-eid',
+    name: 'Eid Blossom Festival',
+    themeTitle: 'Eid Special Fest',
+    tagline: 'Celebrate joyous moments with pistachio rose lattes, saffron cardamoms & 20% off!',
+    promoCode: 'EIDMUBARAK',
+    discountPercent: 20,
+    icon: 'nightlight_round',
+    badge: '🌙 Eid Celebration',
+    themeColor: {
+      bg: 'bg-emerald-900',
+      border: 'border-emerald-700/60',
+      text: 'text-emerald-50',
+      badgeBg: 'bg-emerald-700/80',
+      badgeText: 'text-emerald-100',
+      accent: '#059669',
+    },
+    featuredDrinkIds: ['pistachio-rose-latte', 'cardamom-rose-croissant', 'honey-latte'],
+    bannerImage: 'https://images.unsplash.com/photo-1541167760496-1628856ab772?auto=format&fit=crop&w=800&q=80',
+    expiryNote: 'Valid across all festival orders',
+    isActive: true,
+  },
+  {
+    id: 'fest-spring',
+    name: 'Spring Sakura & Blossom Fest',
+    themeTitle: 'Spring Garden Carnival',
+    tagline: 'Floral botanicals, lavender cold brew & elderflower infusions with 15% discount.',
+    promoCode: 'SPRINGBLOOM',
+    discountPercent: 15,
+    icon: 'local_florist',
+    badge: '🌸 Spring Floral',
+    themeColor: {
+      bg: 'bg-[#53262b]',
+      border: 'border-rose-300/40',
+      text: 'text-rose-50',
+      badgeBg: 'bg-rose-900/60',
+      badgeText: 'text-rose-100',
+      accent: '#e11d48',
+    },
+    featuredDrinkIds: ['lavender-cold-brew', 'rosemary-blossom-matcha', 'elderflower-citrus-cold-brew'],
+    bannerImage: 'https://images.unsplash.com/photo-1517256064527-09c73fc73e38?auto=format&fit=crop&w=800&q=80',
+    expiryNote: 'Limited Spring Blossom season',
+    isActive: false,
+  },
+  {
+    id: 'fest-boishakh',
+    name: 'Pohela Boishakh Fest',
+    themeTitle: 'Noboborsho Utsab',
+    tagline: 'Celebrate the New Year with spiced jaggery cold brews & festive 25% savings!',
+    promoCode: 'BOISHAKH25',
+    discountPercent: 25,
+    icon: 'celebration',
+    badge: '🎉 Boishakhi Fest',
+    themeColor: {
+      bg: 'bg-amber-950',
+      border: 'border-amber-700/60',
+      text: 'text-amber-50',
+      badgeBg: 'bg-amber-800/80',
+      badgeText: 'text-amber-100',
+      accent: '#d97706',
+    },
+    featuredDrinkIds: ['spanish-honey-cortado', 'salted-caramel-cream-cold-brew', 'almond-croissant'],
+    bannerImage: 'https://images.unsplash.com/photo-1534778101976-62847782c213?auto=format&fit=crop&w=800&q=80',
+    expiryNote: 'Festive season promo',
+    isActive: false,
+  },
+  {
+    id: 'fest-winter',
+    name: 'Winter Spice & Cinnamon Holidays',
+    themeTitle: 'Winter Wonderland',
+    tagline: 'Warm rosemary maple flat whites & cinnamon cardamom buns with 18% off!',
+    promoCode: 'WINTERWARM',
+    discountPercent: 18,
+    icon: 'ac_unit',
+    badge: '❄️ Winter Special',
+    themeColor: {
+      bg: 'bg-slate-900',
+      border: 'border-slate-700',
+      text: 'text-slate-50',
+      badgeBg: 'bg-slate-800',
+      badgeText: 'text-sky-200',
+      accent: '#0284c7',
+    },
+    featuredDrinkIds: ['rosemary-maple-flat-white', 'honey-latte', 'cardamom-bun'],
+    bannerImage: 'https://images.unsplash.com/photo-1577968897966-3d4325b36b61?auto=format&fit=crop&w=800&q=80',
+    expiryNote: 'Cozy winter brew special',
+    isActive: false,
+  },
+];
+

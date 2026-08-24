@@ -1,9 +1,11 @@
 import React from 'react';
-import { CartItem } from '../types';
+import { CartItem, FestivalPromotion } from '../types';
 import { BotanicalDivider } from './BotanicalDivider';
 
 interface CartScreenProps {
   cartItems: CartItem[];
+  activePromo?: FestivalPromotion;
+  appliedPromoCode?: string;
   onUpdateQuantity: (id: string, delta: number) => void;
   onRemoveItem: (id: string) => void;
   onProceedToCheckout: () => void;
@@ -12,6 +14,8 @@ interface CartScreenProps {
 
 export const CartScreen: React.FC<CartScreenProps> = ({
   cartItems,
+  activePromo,
+  appliedPromoCode,
   onUpdateQuantity,
   onRemoveItem,
   onProceedToCheckout,
@@ -19,8 +23,15 @@ export const CartScreen: React.FC<CartScreenProps> = ({
 }) => {
   const totalItemCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
   const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
-  const estimatedTax = Number((subtotal * 0.08).toFixed(2));
-  const total = Number((subtotal + estimatedTax).toFixed(2));
+
+  const discountPercent =
+    appliedPromoCode && activePromo?.promoCode.toUpperCase() === appliedPromoCode.toUpperCase()
+      ? activePromo.discountPercent
+      : 0;
+  const discountAmount = Number(((subtotal * discountPercent) / 100).toFixed(2));
+  const discountedSubtotal = Math.max(0, subtotal - discountAmount);
+  const estimatedTax = Number((discountedSubtotal * 0.08).toFixed(2));
+  const total = Number((discountedSubtotal + estimatedTax).toFixed(2));
 
   return (
     <div className="w-full min-h-screen bg-[#fbf9f5] pt-6 pb-32">
@@ -140,7 +151,26 @@ export const CartScreen: React.FC<CartScreenProps> = ({
 
           {/* Order Summary Aside */}
           {cartItems.length > 0 && (
-            <aside className="w-full lg:w-[380px] shrink-0 lg:sticky lg:top-24">
+            <aside className="w-full lg:w-[380px] shrink-0 lg:sticky lg:top-24 space-y-4">
+              {/* Festival Promo Card in Aside */}
+              {activePromo && (
+                <div className="bg-emerald-900 text-emerald-50 rounded-2xl p-4 shadow-sm border border-emerald-700/50">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="material-symbols-outlined text-base text-emerald-300">celebration</span>
+                    <span className="font-bold text-xs font-jakarta tracking-wide">
+                      {activePromo.themeTitle}
+                    </span>
+                  </div>
+                  <p className="text-xs text-emerald-200 font-jakarta leading-relaxed mb-2.5">
+                    Use code <span className="font-mono font-bold bg-emerald-800 text-white px-1.5 py-0.5 rounded border border-emerald-600">{activePromo.promoCode}</span> for {activePromo.discountPercent}% off at checkout!
+                  </p>
+                  <div className="flex items-center justify-between text-[11px] text-emerald-300 font-jakarta">
+                    <span>{activePromo.badge}</span>
+                    <span className="font-semibold">{activePromo.expiryNote}</span>
+                  </div>
+                </div>
+              )}
+
               <div className="bg-[#f5f3ef] rounded-2xl p-6 border border-[#efeeea] shadow-[0_4px_20px_rgba(62,39,35,0.05)]">
                 <h3 className="font-literata text-xl font-bold text-[#271310] mb-5">
                   Order Summary
@@ -151,6 +181,17 @@ export const CartScreen: React.FC<CartScreenProps> = ({
                     <span>Subtotal ({totalItemCount} {totalItemCount === 1 ? 'item' : 'items'})</span>
                     <span className="font-medium text-[#1b1c1a]">${subtotal.toFixed(2)}</span>
                   </div>
+
+                  {discountAmount > 0 && (
+                    <div className="flex justify-between text-emerald-700 font-bold">
+                      <span className="flex items-center gap-1">
+                        <span className="material-symbols-outlined text-xs">local_offer</span>
+                        Festival Discount ({appliedPromoCode})
+                      </span>
+                      <span>-${discountAmount.toFixed(2)}</span>
+                    </div>
+                  )}
+
                   <div className="flex justify-between text-[#504442]">
                     <span>Estimated Tax</span>
                     <span className="font-medium text-[#1b1c1a]">${estimatedTax.toFixed(2)}</span>
@@ -185,3 +226,4 @@ export const CartScreen: React.FC<CartScreenProps> = ({
     </div>
   );
 };
+

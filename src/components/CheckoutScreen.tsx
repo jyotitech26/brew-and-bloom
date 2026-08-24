@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
-import { CartItem, PickupLocation, PaymentMethod, PlacedOrder } from '../types';
-import { CHECKOUT_MAP_IMAGE, PICKUP_LOCATIONS, PAYMENT_METHODS } from '../data/mockData';
+import { CartItem, PickupLocation, PaymentMethod, PlacedOrder, FestivalPromotion } from '../types';
+import { CHECKOUT_MAP_IMAGE, PICKUP_LOCATIONS, PAYMENT_METHODS, FESTIVAL_PROMOTIONS } from '../data/mockData';
 
 interface CheckoutScreenProps {
   cartItems: CartItem[];
+  initialPromoCode?: string;
   onBack: () => void;
   onOrderCompleted: (order: PlacedOrder) => void;
 }
 
 export const CheckoutScreen: React.FC<CheckoutScreenProps> = ({
   cartItems,
+  initialPromoCode = '',
   onBack,
   onOrderCompleted,
 }) => {
@@ -23,13 +25,93 @@ export const CheckoutScreen: React.FC<CheckoutScreenProps> = ({
   const [newCardExpiry, setNewCardExpiry] = useState('');
   const [isProcessingOrder, setIsProcessingOrder] = useState(false);
 
+  // Festival Promo Code State
+  const [promoCodeInput, setPromoCodeInput] = useState(initialPromoCode);
+  const [appliedPromo, setAppliedPromo] = useState<FestivalPromotion | null>(() => {
+    if (!initialPromoCode) return null;
+    return (
+      FESTIVAL_PROMOTIONS.find(
+        (p) => p.promoCode.toUpperCase() === initialPromoCode.toUpperCase()
+      ) || null
+    );
+  });
+  const [promoError, setPromoError] = useState<string>('');
+  const [promoSuccessMessage, setPromoSuccessMessage] = useState<string>(
+    initialPromoCode ? 'Festival promo applied!' : ''
+  );
+
   // Delivery Address State
   const [deliveryAddress, setDeliveryAddress] = useState('742 Evergreen Terrace, Apt 4B');
 
   const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
-  const estimatedTax = Number((subtotal * 0.08).toFixed(2));
+  
+  // Calculate discount percentage from applied promo
+  const discountAmount = appliedPromo
+    ? Number(((subtotal * appliedPromo.discountPercent) / 100).toFixed(2))
+    : 0;
+
+  const discountedSubtotal = Math.max(0, subtotal - discountAmount);
+  const estimatedTax = Number((discountedSubtotal * 0.08).toFixed(2));
   const deliveryFee = orderType === 'Delivery' ? 2.50 : 0;
-  const total = Number((subtotal + estimatedTax + deliveryFee).toFixed(2));
+  const total = Number((discountedSubtotal + estimatedTax + deliveryFee).toFixed(2));
+
+  const handleApplyCoupon = (codeToApply?: string) => {
+    const code = (codeToApply || promoCodeInput).trim().toUpperCase();
+    setPromoError('');
+    setPromoSuccessMessage('');
+
+    if (!code) {
+      setPromoError('Please enter a promo code');
+      return;
+    }
+
+    const matchedPromo = FESTIVAL_PROMOTIONS.find(
+      (p) => p.promoCode.toUpperCase() === code
+    );
+
+    if (matchedPromo) {
+      setAppliedPromo(matchedPromo);
+      setPromoCodeInput(matchedPromo.promoCode);
+      setPromoSuccessMessage(
+        `🎉 ${matchedPromo.name} applied! You saved ${matchedPromo.discountPercent}%!`
+      );
+    } else if (code === 'WELCOME10') {
+      const genericPromo: FestivalPromotion = {
+        id: 'generic-welcome',
+        name: 'Welcome Special',
+        themeTitle: 'Welcome Discount',
+        tagline: 'Special 10% discount on your artisanal coffee order.',
+        promoCode: 'WELCOME10',
+        discountPercent: 10,
+        icon: 'local_cafe',
+        badge: '☕ Welcome Perk',
+        themeColor: {
+          bg: 'bg-stone-900',
+          border: 'border-stone-700',
+          text: 'text-stone-100',
+          badgeBg: 'bg-stone-800',
+          badgeText: 'text-stone-200',
+          accent: '#78350f',
+        },
+        featuredDrinkIds: [],
+        bannerImage: '',
+        expiryNote: 'Single use discount',
+        isActive: true,
+      };
+      setAppliedPromo(genericPromo);
+      setPromoCodeInput('WELCOME10');
+      setPromoSuccessMessage('🎉 Welcome perk applied! 10% discount.');
+    } else {
+      setPromoError('Invalid promo code. Try EIDMUBARAK, SPRINGBLOOM, or BOISHAKH25');
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    setAppliedPromo(null);
+    setPromoCodeInput('');
+    setPromoError('');
+    setPromoSuccessMessage('');
+  };
 
   const handlePlaceOrder = () => {
     setIsProcessingOrder(true);
@@ -45,6 +127,8 @@ export const CheckoutScreen: React.FC<CheckoutScreenProps> = ({
         orderNumber: `#BB-${randomOrderNum}`,
         items: [...cartItems],
         subtotal,
+        discount: discountAmount,
+        promoCode: appliedPromo ? appliedPromo.promoCode : undefined,
         tax: estimatedTax,
         total,
         orderType,
@@ -211,6 +295,103 @@ export const CheckoutScreen: React.FC<CheckoutScreenProps> = ({
           </section>
         )}
 
+        {/* Festival Promo Code & Coupon Section */}
+        <section className="space-y-3">
+          <div className="flex justify-between items-center border-b border-[#e4e2de] pb-2">
+            <h2 className="font-literata text-xl font-bold text-[#271310] flex items-center gap-2">
+              <span className="material-symbols-outlined text-[#059669]">local_offer</span>
+              Festival Promo & Voucher
+            </h2>
+            <span className="text-xs text-[#655d5a] font-jakarta">Festive savings</span>
+          </div>
+
+          <div className="bg-[#ffffff] p-4 sm:p-5 rounded-2xl border border-[#efeeea] shadow-[0_2px_8px_rgba(62,39,35,0.03)] space-y-3.5">
+            {/* Input Row */}
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <input
+                  type="text"
+                  value={promoCodeInput}
+                  onChange={(e) => {
+                    setPromoCodeInput(e.target.value);
+                    if (promoError) setPromoError('');
+                  }}
+                  placeholder="Enter code (e.g. EIDMUBARAK, SPRINGBLOOM)"
+                  className="w-full uppercase font-mono text-sm font-bold bg-[#fbf9f5] border border-[#d3c3c0] rounded-xl px-3.5 py-2.5 text-[#271310] focus:ring-2 focus:ring-[#271310] outline-none tracking-wider placeholder:font-normal placeholder:normal-case placeholder:font-jakarta"
+                />
+                {appliedPromo && (
+                  <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-emerald-600 text-lg">
+                    check_circle
+                  </span>
+                )}
+              </div>
+
+              {appliedPromo ? (
+                <button
+                  type="button"
+                  onClick={handleRemoveCoupon}
+                  className="px-4 py-2.5 rounded-xl border border-[#ba1a1a]/40 text-[#ba1a1a] font-jakarta text-xs font-bold hover:bg-rose-50 transition-colors cursor-pointer"
+                >
+                  Remove
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => handleApplyCoupon()}
+                  className="px-5 py-2.5 rounded-xl bg-[#271310] text-[#ffffff] font-jakarta text-xs font-bold hover:bg-[#3e2723] transition-colors cursor-pointer shadow-xs active:scale-95"
+                >
+                  Apply
+                </button>
+              )}
+            </div>
+
+            {/* Error or Success Feedback */}
+            {promoError && (
+              <p className="text-xs text-[#ba1a1a] font-jakarta font-medium flex items-center gap-1">
+                <span className="material-symbols-outlined text-sm">error</span>
+                {promoError}
+              </p>
+            )}
+
+            {promoSuccessMessage && appliedPromo && (
+              <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3 flex items-center justify-between text-xs font-jakarta text-emerald-900">
+                <span className="font-semibold">{promoSuccessMessage}</span>
+                <span className="font-bold font-mono bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-md">
+                  -{appliedPromo.discountPercent}%
+                </span>
+              </div>
+            )}
+
+            {/* Quick Available Festival Codes */}
+            <div className="pt-1">
+              <p className="text-[11px] text-[#655d5a] font-jakarta font-medium mb-1.5 flex items-center gap-1">
+                <span className="material-symbols-outlined text-xs">celebration</span>
+                Tap to apply active festival codes:
+              </p>
+              <div className="flex flex-wrap gap-1.5">
+                {FESTIVAL_PROMOTIONS.map((fest) => {
+                  const isCurrent = appliedPromo?.promoCode === fest.promoCode;
+                  return (
+                    <button
+                      key={fest.id}
+                      type="button"
+                      onClick={() => handleApplyCoupon(fest.promoCode)}
+                      className={`text-[11px] font-mono font-bold px-2.5 py-1 rounded-lg border transition-all cursor-pointer flex items-center gap-1 ${
+                        isCurrent
+                          ? 'bg-emerald-700 text-white border-emerald-700 shadow-xs'
+                          : 'bg-[#efeeea] text-[#271310] hover:bg-[#eae8e4] border-[#d3c3c0]/60'
+                      }`}
+                    >
+                      <span>{fest.promoCode}</span>
+                      <span className="text-[10px] opacity-80">({fest.discountPercent}% off)</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Order Summary Preview (Compact) */}
         <section className="space-y-3">
           <h2 className="font-literata text-xl font-bold text-[#271310] border-b border-[#e4e2de] pb-2">
@@ -239,12 +420,34 @@ export const CheckoutScreen: React.FC<CheckoutScreenProps> = ({
               </div>
             ))}
 
-            {orderType === 'Delivery' && (
-              <div className="flex justify-between items-center pt-2 border-t border-[#efeeea] text-xs text-[#504442]">
-                <span>Delivery Fee</span>
-                <span className="font-semibold text-[#271310]">$2.50</span>
+            <div className="pt-2 border-t border-[#efeeea] space-y-1.5 text-xs text-[#504442] font-jakarta">
+              <div className="flex justify-between items-center">
+                <span>Subtotal</span>
+                <span className="font-semibold text-[#271310]">${subtotal.toFixed(2)}</span>
               </div>
-            )}
+
+              {discountAmount > 0 && (
+                <div className="flex justify-between items-center text-emerald-700 font-bold">
+                  <span className="flex items-center gap-1">
+                    <span className="material-symbols-outlined text-sm">local_offer</span>
+                    Festival Discount ({appliedPromo?.promoCode})
+                  </span>
+                  <span>-${discountAmount.toFixed(2)}</span>
+                </div>
+              )}
+
+              <div className="flex justify-between items-center">
+                <span>Estimated Tax (8%)</span>
+                <span className="font-semibold text-[#271310]">${estimatedTax.toFixed(2)}</span>
+              </div>
+
+              {orderType === 'Delivery' && (
+                <div className="flex justify-between items-center">
+                  <span>Delivery Fee</span>
+                  <span className="font-semibold text-[#271310]">$2.50</span>
+                </div>
+              )}
+            </div>
           </div>
         </section>
 

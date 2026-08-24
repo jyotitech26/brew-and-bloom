@@ -3,6 +3,7 @@ import React from 'react';
 interface TopAppBarProps {
   title?: string;
   cartCount: number;
+  isCloudConnected?: boolean;
   onOpenCart: () => void;
   onOpenBrandStory?: () => void;
   onBack?: () => void;
@@ -13,6 +14,7 @@ interface TopAppBarProps {
 export const TopAppBar: React.FC<TopAppBarProps> = ({
   title = 'Brew & Bloom',
   cartCount,
+  isCloudConnected = true,
   onOpenCart,
   onOpenBrandStory,
   onBack,
@@ -20,7 +22,7 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({
 }) => {
   return (
     <header className="bg-[#fbf9f5] border-b border-[#efeeea] text-[#271310] flex justify-between items-center px-4 sm:px-8 h-16 w-full fixed top-0 left-0 right-0 z-40 transition-shadow shadow-xs">
-      <div className="flex items-center">
+      <div className="flex items-center gap-2">
         {showBack ? (
           <button
             onClick={onBack}
@@ -38,6 +40,16 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({
           >
             <span className="material-symbols-outlined text-2xl">local_florist</span>
           </button>
+        )}
+
+        {isCloudConnected && (
+          <div
+            title="Connected to Firebase Firestore Cloud Database"
+            className="hidden sm:flex items-center gap-1.5 bg-[#ece0dc]/70 text-[#271310] text-[10px] font-semibold px-2.5 py-1 rounded-full border border-[#d3c3c0]/60 font-jakarta"
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span>
+            <span>Cloud Sync Active</span>
+          </div>
         )}
       </div>
 
