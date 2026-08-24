@@ -5,6 +5,7 @@ import { BotanicalDivider } from './BotanicalDivider';
 interface ProductDetailScreenProps {
   product: ProductItem;
   onAddToCart: (item: Omit<CartItem, 'id'>) => void;
+  onBuyNow?: (item: Omit<CartItem, 'id'>) => void;
   onBack: () => void;
   onOpenCart: () => void;
   cartCount: number;
@@ -13,6 +14,7 @@ interface ProductDetailScreenProps {
 export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
   product,
   onAddToCart,
+  onBuyNow,
   onBack,
   onOpenCart,
   cartCount,
@@ -31,7 +33,7 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
   const milkDelta = milkOption ? milkOption.priceDelta : 0;
   const calculatedPrice = Number((product.price + sizeDelta + milkDelta).toFixed(2));
 
-  const handleAdd = () => {
+  const buildCartItem = (): Omit<CartItem, 'id'> => {
     const milkName = milkOption ? milkOption.name : undefined;
     const notesList: string[] = [];
     if (milkName) notesList.push(milkName);
@@ -42,7 +44,7 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
       notesList.push(selectedSweetness);
     }
 
-    onAddToCart({
+    return {
       productId: product.id,
       name: product.name,
       basePrice: product.price,
@@ -54,12 +56,25 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
       notes: notesList.length > 0 ? notesList.join(', ') : `${selectedSize} size`,
       quantity: 1,
       image: product.image,
-    });
+    };
+  };
 
+  const handleAdd = () => {
+    onAddToCart(buildCartItem());
     setIsAddedToast(true);
     setTimeout(() => {
       setIsAddedToast(false);
-    }, 2200);
+    }, 3500);
+  };
+
+  const handleInstantBuy = () => {
+    const item = buildCartItem();
+    if (onBuyNow) {
+      onBuyNow(item);
+    } else {
+      onAddToCart(item);
+      onOpenCart();
+    }
   };
 
   return (
@@ -96,9 +111,17 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
 
       {/* Added Toast Notification */}
       {isAddedToast && (
-        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-[#271310] text-white px-5 py-2.5 rounded-full shadow-lg text-sm font-medium flex items-center gap-2 animate-in fade-in slide-in-from-top-4 duration-300">
-          <span className="material-symbols-outlined text-base text-[#dbe6cf]">check_circle</span>
-          Added to your order!
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-[#271310] text-white px-5 py-3 rounded-2xl shadow-xl text-sm font-medium flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-300 border border-white/10 max-w-sm w-[90%] sm:w-auto justify-between">
+          <div className="flex items-center gap-2">
+            <span className="material-symbols-outlined text-base text-emerald-400">check_circle</span>
+            <span>Added to your order!</span>
+          </div>
+          <button
+            onClick={onOpenCart}
+            className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold font-jakarta px-3 py-1.5 rounded-xl cursor-pointer"
+          >
+            View Cart
+          </button>
         </div>
       )}
 
@@ -269,16 +292,24 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
             </section>
           )}
 
-          {/* Add to Order Sticky Action Button */}
-          <div className="w-full pt-4">
+          {/* Add to Order & Direct Checkout Action Buttons */}
+          <div className="w-full pt-6 flex flex-col sm:flex-row gap-3">
             <button
               onClick={handleAdd}
-              className="w-full bg-[#271310] text-[#ffffff] font-semibold text-base py-4 rounded-full shadow-[0_4px_16px_rgba(39,19,16,0.2)] hover:opacity-95 active:scale-[0.98] transition-all flex justify-center items-center gap-2 border-t border-white/20 cursor-pointer"
+              className="flex-1 bg-[#efeeea] hover:bg-[#e4e2de] text-[#271310] border border-[#d3c3c0] font-semibold text-sm sm:text-base py-3.5 px-6 rounded-2xl transition-all flex justify-center items-center gap-2 cursor-pointer active:scale-95 shadow-xs"
             >
-              <span className="material-symbols-outlined text-xl material-symbols-filled">
+              <span className="material-symbols-outlined text-lg material-symbols-filled">
                 shopping_bag
               </span>
-              <span>Add to Order • ${calculatedPrice.toFixed(2)}</span>
+              <span>Add to Bag • ${calculatedPrice.toFixed(2)}</span>
+            </button>
+
+            <button
+              onClick={handleInstantBuy}
+              className="flex-1 bg-[#271310] hover:bg-[#3e2723] text-[#ffffff] font-semibold text-sm sm:text-base py-3.5 px-6 rounded-2xl shadow-[0_4px_16px_rgba(39,19,16,0.2)] transition-all flex justify-center items-center gap-2 cursor-pointer active:scale-95"
+            >
+              <span>Checkout Now</span>
+              <span className="material-symbols-outlined text-lg">arrow_forward</span>
             </button>
           </div>
         </div>

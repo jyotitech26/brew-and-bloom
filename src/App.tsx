@@ -280,6 +280,11 @@ export default function App() {
             onAddToCart={(item) => {
               handleAddToCart(item);
             }}
+            onBuyNow={(item) => {
+              handleAddToCart(item);
+              setSelectedProduct(null);
+              setIsCheckoutView(true);
+            }}
             onBack={() => setSelectedProduct(null)}
             onOpenCart={() => {
               setSelectedProduct(null);
@@ -309,6 +314,10 @@ export default function App() {
             appliedPromoCode={appliedPromoCode}
             onSelectProduct={(p) => setSelectedProduct(p)}
             onQuickAdd={handleQuickAdd}
+            onOpenCart={() => {
+              setActiveTab('order');
+              setSelectedProduct(null);
+            }}
             onToggleFavorite={handleToggleFavorite}
             favoriteIds={favoriteIds}
           />

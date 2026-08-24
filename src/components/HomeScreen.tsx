@@ -12,6 +12,7 @@ interface HomeScreenProps {
   appliedPromoCode?: string;
   onSelectProduct: (product: ProductItem) => void;
   onQuickAdd: (product: ProductItem) => void;
+  onOpenCart?: () => void;
   onToggleFavorite: (productId: string) => void;
   favoriteIds: string[];
 }
@@ -25,11 +26,14 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   appliedPromoCode,
   onSelectProduct,
   onQuickAdd,
+  onOpenCart,
   onToggleFavorite,
   favoriteIds,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  const [recentlyAddedProduct, setRecentlyAddedProduct] = useState<ProductItem | null>(null);
+  const [addedButtonId, setAddedButtonId] = useState<string | null>(null);
 
   const categories = ['All', 'Hot Coffee', 'Cold Brew', 'Tea', 'Bakery'];
 
@@ -256,11 +260,25 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                         onClick={(e) => {
                           e.stopPropagation();
                           onQuickAdd(product);
+                          setAddedButtonId(product.id);
+                          setRecentlyAddedProduct(product);
+                          setTimeout(() => {
+                            setAddedButtonId((prev) => (prev === product.id ? null : prev));
+                          }, 2000);
+                          setTimeout(() => {
+                            setRecentlyAddedProduct((prev) => (prev?.id === product.id ? null : prev));
+                          }, 4000);
                         }}
-                        className="flex-1 bg-[#271310] text-[#ffffff] font-jakarta text-xs font-semibold py-2.5 px-4 rounded-xl hover:bg-[#3e2723] transition-colors shadow-xs flex items-center justify-center gap-1.5 cursor-pointer active:scale-95"
+                        className={`flex-1 font-jakarta text-xs font-semibold py-2.5 px-4 rounded-xl transition-all shadow-xs flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 ${
+                          addedButtonId === product.id
+                            ? 'bg-emerald-700 text-white'
+                            : 'bg-[#271310] text-[#ffffff] hover:bg-[#3e2723]'
+                        }`}
                       >
-                        <span className="material-symbols-outlined text-sm">add</span>
-                        <span>Quick Order</span>
+                        <span className="material-symbols-outlined text-sm">
+                          {addedButtonId === product.id ? 'check' : 'add'}
+                        </span>
+                        <span>{addedButtonId === product.id ? 'Added!' : 'Quick Order'}</span>
                       </button>
                       <button
                         onClick={(e) => {
@@ -280,6 +298,30 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
           </div>
         )}
       </section>
+
+      {/* Instant Quick Order Floating Notification Toast */}
+      {recentlyAddedProduct && (
+        <div className="fixed bottom-20 md:bottom-8 left-1/2 -translate-x-1/2 z-50 bg-[#271310] text-[#fbf9f5] px-5 py-3.5 rounded-2xl shadow-[0_12px_40px_rgba(0,0,0,0.35)] flex items-center justify-between gap-4 border border-white/15 animate-in fade-in slide-in-from-bottom-5 duration-300 w-[92%] max-w-md">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <span className="material-symbols-outlined text-emerald-400 text-2xl shrink-0">check_circle</span>
+            <div className="min-w-0">
+              <p className="text-xs sm:text-sm font-bold font-jakarta text-white truncate">
+                {recentlyAddedProduct.name}
+              </p>
+              <p className="text-[11px] text-[#ae8d87] font-jakarta">Added to your order bag</p>
+            </div>
+          </div>
+          {onOpenCart && (
+            <button
+              onClick={onOpenCart}
+              className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold font-jakarta px-4 py-2 rounded-xl transition-all shadow-xs cursor-pointer shrink-0 flex items-center gap-1.5 active:scale-95"
+            >
+              <span>View Cart</span>
+              <span className="material-symbols-outlined text-sm">arrow_forward</span>
+            </button>
+          )}
+        </div>
+      )}
     </main>
   );
 };
