@@ -254,6 +254,12 @@ export default function App() {
       {/* Top Header - Shown on regular views (hidden during Checkout because Checkout has its own specialized header) */}
       {!isCheckoutView && !selectedProduct && (
         <TopAppBar
+          activeTab={activeTab}
+          onSelectTab={(tab) => {
+            setActiveTab(tab);
+            setSelectedProduct(null);
+            setIsCheckoutView(false);
+          }}
           cartCount={totalCartCount}
           isCloudConnected={isCloudConnected}
           onOpenCart={() => {

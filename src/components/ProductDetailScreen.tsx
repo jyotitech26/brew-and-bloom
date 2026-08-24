@@ -65,31 +65,33 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
   return (
     <div className="w-full min-h-screen bg-[#fbf9f5] pb-28 pt-16">
       {/* Top Header */}
-      <header className="bg-[#fbf9f5] border-b border-[#efeeea] text-[#271310] flex justify-between items-center px-4 sm:px-8 h-16 w-full fixed top-0 left-0 right-0 z-40 shadow-xs">
-        <button
-          onClick={onBack}
-          className="hover:opacity-80 transition-opacity active:scale-95 duration-150 p-2 -ml-2 rounded-full text-[#504442] hover:bg-[#eae8e4] flex items-center justify-center cursor-pointer"
-          aria-label="Go back to menu"
-        >
-          <span className="material-symbols-outlined text-2xl">arrow_back</span>
-        </button>
+      <header className="bg-[#fbf9f5]/95 backdrop-blur-md border-b border-[#efeeea] text-[#271310] fixed top-0 left-0 right-0 z-40 shadow-xs">
+        <div className="max-w-[1240px] mx-auto w-full px-4 sm:px-8 h-16 flex justify-between items-center">
+          <button
+            onClick={onBack}
+            className="hover:opacity-80 transition-opacity active:scale-95 duration-150 p-2 -ml-2 rounded-full text-[#504442] hover:bg-[#eae8e4] flex items-center justify-center cursor-pointer"
+            aria-label="Go back to menu"
+          >
+            <span className="material-symbols-outlined text-2xl">arrow_back</span>
+          </button>
 
-        <span className="font-literata text-xl sm:text-2xl font-bold tracking-tight text-[#271310] select-none">
-          Brew &amp; Bloom
-        </span>
+          <span className="font-literata text-xl sm:text-2xl font-bold tracking-tight text-[#271310] select-none">
+            Brew &amp; Bloom
+          </span>
 
-        <button
-          onClick={onOpenCart}
-          className="hover:opacity-80 transition-opacity active:scale-95 duration-150 p-2 -mr-2 rounded-full text-[#271310] hover:bg-[#eae8e4] flex items-center justify-center relative cursor-pointer"
-          aria-label="Shopping Cart"
-        >
-          <span className="material-symbols-outlined text-2xl">shopping_bag</span>
-          {cartCount > 0 && (
-            <span className="absolute top-1.5 right-1.5 bg-[#271310] text-[#ffffff] text-[11px] font-bold h-4.5 min-w-4.5 px-1 rounded-full flex items-center justify-center shadow-xs">
-              {cartCount}
-            </span>
-          )}
-        </button>
+          <button
+            onClick={onOpenCart}
+            className="hover:opacity-80 transition-opacity active:scale-95 duration-150 p-2 -mr-2 rounded-full text-[#271310] hover:bg-[#eae8e4] flex items-center justify-center relative cursor-pointer"
+            aria-label="Shopping Cart"
+          >
+            <span className="material-symbols-outlined text-2xl">shopping_bag</span>
+            {cartCount > 0 && (
+              <span className="absolute top-1.5 right-1.5 bg-[#271310] text-[#ffffff] text-[11px] font-bold h-4.5 min-w-4.5 px-1 rounded-full flex items-center justify-center shadow-xs">
+                {cartCount}
+              </span>
+            )}
+          </button>
+        </div>
       </header>
 
       {/* Added Toast Notification */}

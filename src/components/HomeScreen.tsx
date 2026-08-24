@@ -48,7 +48,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   }, [products, searchQuery, selectedCategory]);
 
   return (
-    <main className="max-w-[1200px] mx-auto px-4 sm:px-8 pt-6 pb-28">
+    <main className="max-w-[1240px] mx-auto px-4 sm:px-8 pt-6 pb-28">
       {/* Interactive Festival Promo Showcase */}
       <FestivalPromoBanner
         promotions={promotions}
@@ -58,55 +58,67 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         appliedPromoCode={appliedPromoCode}
       />
 
-      {/* Hero Greeting Section */}
+      {/* Hero Greeting & Search Section */}
       <section className="mb-8">
-        <h2 className="font-literata text-2xl sm:text-3xl lg:text-4xl font-bold text-[#271310] mb-1">
-          Good Morning, Coffee Lover
-        </h2>
-        <p className="font-jakarta text-base sm:text-lg text-[#504442] mb-6">
-          What are we brewing for you today?
-        </p>
-
-        {/* Search Bar */}
-        <div className="relative w-full mb-6 max-w-2xl">
-          <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[#504442] text-xl">
-            search
-          </span>
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search for your favorite brew or festival specials..."
-            className="w-full bg-[#efeeea] rounded-full py-3.5 pl-12 pr-10 text-[#1b1c1a] placeholder:text-[#827472] border border-transparent focus:border-[#827472] focus:bg-[#ffffff] outline-none transition-all text-sm sm:text-base font-jakarta"
-          />
-          {searchQuery && (
-            <button
-              onClick={() => setSearchQuery('')}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-[#827472] hover:text-[#271310] p-1"
-            >
-              <span className="material-symbols-outlined text-sm">close</span>
-            </button>
-          )}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
+          <div>
+            <h2 className="font-literata text-2xl sm:text-3xl lg:text-4xl font-bold text-[#271310] tracking-tight mb-1">
+              Good Morning, Coffee Lover
+            </h2>
+            <p className="font-jakarta text-sm sm:text-base text-[#504442]">
+              What botanical brew can we craft for you today?
+            </p>
+          </div>
+          <div className="hidden sm:flex items-center gap-2 text-xs font-semibold text-[#827472] font-jakarta bg-[#efeeea] px-3.5 py-1.5 rounded-full self-start md:self-auto">
+            <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
+            <span>{filteredProducts.length} Artisanal Brews Available</span>
+          </div>
         </div>
 
-        {/* Categories Carousel */}
-        <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-none snap-x -mx-4 px-4 sm:mx-0 sm:px-0">
-          {categories.map((cat) => {
-            const isSelected = selectedCategory === cat;
-            return (
+        {/* Search Bar & Category Filter Row */}
+        <div className="flex flex-col md:flex-row gap-4 items-stretch md:items-center justify-between mb-4">
+          {/* Search Bar */}
+          <div className="relative flex-1 max-w-xl">
+            <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[#827472] text-xl">
+              search
+            </span>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search by name, ingredients, or festival specials..."
+              className="w-full bg-[#efeeea] rounded-full py-3.5 pl-12 pr-10 text-[#1b1c1a] placeholder:text-[#827472] border border-transparent focus:border-[#827472] focus:bg-[#ffffff] outline-none transition-all text-sm font-jakarta shadow-xs"
+            />
+            {searchQuery && (
               <button
-                key={cat}
-                onClick={() => setSelectedCategory(cat)}
-                className={`snap-start shrink-0 px-5 py-2 rounded-full text-xs font-semibold uppercase tracking-wider transition-all duration-150 cursor-pointer ${
-                  isSelected
-                    ? 'bg-[#655d5a] text-[#ffffff] shadow-[0_2px_8px_rgba(62,39,35,0.12)] -translate-y-0.5'
-                    : 'bg-[#efeeea] text-[#1b1c1a] hover:bg-[#e4e2de]'
-                }`}
+                onClick={() => setSearchQuery('')}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-[#827472] hover:text-[#271310] p-1 cursor-pointer"
+                aria-label="Clear search"
               >
-                {cat}
+                <span className="material-symbols-outlined text-sm">close</span>
               </button>
-            );
-          })}
+            )}
+          </div>
+
+          {/* Categories Carousel */}
+          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none snap-x shrink-0">
+            {categories.map((cat) => {
+              const isSelected = selectedCategory === cat;
+              return (
+                <button
+                  key={cat}
+                  onClick={() => setSelectedCategory(cat)}
+                  className={`snap-start px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer ${
+                    isSelected
+                      ? 'bg-[#271310] text-[#ffffff] shadow-xs scale-[1.02]'
+                      : 'bg-[#efeeea] text-[#504442] hover:bg-[#e4e2de] hover:text-[#271310]'
+                  }`}
+                >
+                  {cat}
+                </button>
+              );
+            })}
+          </div>
         </div>
       </section>
 
@@ -120,7 +132,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
             <h3 className="font-literata text-2xl font-bold text-[#271310]">
               {selectedCategory === 'All' ? 'Featured Brews & Festival Specials' : selectedCategory}
             </h3>
-            <p className="text-xs text-[#655d5a] font-jakarta">Handcrafted with organic botanical ingredients</p>
+            <p className="text-xs text-[#655d5a] font-jakarta">Handcrafted with organic botanical ingredients & local roasted beans</p>
           </div>
           <button
             onClick={() => {
@@ -156,7 +168,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredProducts.map((product) => {
               const isFav = favoriteIds.includes(product.id);
               const isFestivalFeatured = activePromo.featuredDrinkIds?.includes(product.id);
@@ -164,103 +176,99 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
               return (
                 <div
                   key={product.id}
-                  className={`group relative rounded-2xl overflow-hidden bg-[#f5f3ef] border shadow-[0_4px_16px_rgba(62,39,35,0.04)] hover:shadow-[0_8px_24px_rgba(62,39,35,0.08)] hover:-translate-y-1 transition-all duration-300 p-4 sm:p-5 flex flex-col sm:flex-row gap-5 cursor-pointer ${
-                    isFestivalFeatured ? 'border-[#ba1a1a]/30 ring-1 ring-[#ba1a1a]/20' : 'border-[#efeeea]'
+                  className={`group relative rounded-2xl overflow-hidden bg-[#ffffff] border shadow-[0_4px_18px_rgba(62,39,35,0.04)] hover:shadow-[0_12px_28px_rgba(62,39,35,0.09)] hover:-translate-y-1.5 transition-all duration-300 flex flex-col cursor-pointer ${
+                    isFestivalFeatured ? 'border-[#ba1a1a]/40 ring-1 ring-[#ba1a1a]/20' : 'border-[#efeeea]'
                   }`}
                   onClick={() => onSelectProduct(product)}
                 >
                   {/* Card Thumbnail Image */}
-                  <div className="w-full sm:w-44 h-48 sm:h-44 rounded-xl overflow-hidden shrink-0 relative bg-[#eae8e4]">
+                  <div className="w-full h-52 relative overflow-hidden bg-[#eae8e4]">
                     <img
                       src={product.image}
                       alt={product.name}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      className="w-full h-full object-cover transition-transform duration-600 group-hover:scale-105"
+                      loading="lazy"
                     />
-                    {/* Favorite Button */}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onToggleFavorite(product.id);
-                      }}
-                      className="absolute top-2 right-2 bg-[#fbf9f5]/85 backdrop-blur-sm rounded-full p-2 hover:bg-[#ffffff] transition-colors shadow-xs z-10 cursor-pointer"
-                      aria-label="Toggle favorite"
-                    >
-                      <span
-                        className={`material-symbols-outlined text-base ${
-                          isFav
-                            ? 'text-[#ba1a1a] material-symbols-filled'
-                            : 'text-[#271310]'
-                        }`}
+
+                    {/* Top Badges & Favorite Button */}
+                    <div className="absolute top-3 left-3 right-3 flex items-center justify-between pointer-events-none">
+                      <div className="flex items-center gap-1.5 pointer-events-auto">
+                        <span className="bg-[#271310]/85 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full font-jakarta tracking-wide">
+                          {product.category}
+                        </span>
+                        {isFestivalFeatured && (
+                          <span className="bg-emerald-700 text-white text-[10px] font-bold px-2 py-0.5 rounded-full font-jakarta shadow-xs flex items-center gap-1 border border-emerald-500/40">
+                            <span className="material-symbols-outlined text-[12px]">celebration</span>
+                            Festive
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Favorite Button */}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onToggleFavorite(product.id);
+                        }}
+                        className="bg-[#ffffff]/90 hover:bg-[#ffffff] backdrop-blur-md rounded-full p-2 text-[#271310] transition-transform active:scale-90 shadow-sm pointer-events-auto cursor-pointer"
+                        aria-label="Toggle favorite"
                       >
-                        favorite
-                      </span>
-                    </button>
-
-                    {/* Category Pill */}
-                    <span className="absolute bottom-2 left-2 bg-[#271310]/80 backdrop-blur-xs text-white text-[10px] font-semibold px-2.5 py-0.5 rounded-full font-jakarta tracking-wide">
-                      {product.category}
-                    </span>
-
-                    {/* Festival Special Badge */}
-                    {isFestivalFeatured && (
-                      <span className="absolute top-2 left-2 bg-emerald-700 text-emerald-50 text-[10px] font-bold px-2 py-0.5 rounded-full font-jakarta shadow-xs flex items-center gap-1 border border-emerald-500/40">
-                        <span className="material-symbols-outlined text-[12px]">celebration</span>
-                        Festive
-                      </span>
-                    )}
+                        <span
+                          className={`material-symbols-outlined text-base ${
+                            isFav
+                              ? 'text-[#ba1a1a] material-symbols-filled'
+                              : 'text-[#504442]'
+                          }`}
+                        >
+                          favorite
+                        </span>
+                      </button>
+                    </div>
                   </div>
 
                   {/* Card Content Details */}
-                  <div className="flex flex-col justify-between flex-1">
+                  <div className="p-5 flex flex-col flex-1 justify-between gap-3 bg-[#fdfcfa]">
                     <div>
-                      <div className="flex justify-between items-start mb-1.5 gap-2">
-                        <h4 className="font-literata text-lg sm:text-xl font-bold text-[#271310] leading-tight">
-                          {product.headlineTitle ? (
-                            product.headlineTitle.split('\n').map((line, i) => (
-                              <React.Fragment key={i}>
-                                {line}
-                                {i < product.headlineTitle!.split('\n').length - 1 && <br />}
-                              </React.Fragment>
-                            ))
-                          ) : (
-                            product.name
-                          )}
+                      <div className="flex justify-between items-start gap-2 mb-1">
+                        <h4 className="font-literata text-lg font-bold text-[#271310] group-hover:text-[#655d5a] transition-colors leading-snug">
+                          {product.name}
                         </h4>
-                        <div className="text-right">
-                          <span className="font-literata text-lg font-semibold text-[#655d5a] whitespace-nowrap">
+                        <div className="text-right shrink-0">
+                          <span className="font-literata text-lg font-bold text-[#271310]">
                             ${product.price.toFixed(2)}
                           </span>
                           {isFestivalFeatured && (
                             <p className="text-[10px] text-emerald-700 font-bold font-jakarta">
-                              -${(product.price * (activePromo.discountPercent / 100)).toFixed(2)} w/ {activePromo.promoCode}
+                              -${(product.price * (activePromo.discountPercent / 100)).toFixed(2)} off
                             </p>
                           )}
                         </div>
                       </div>
-                      <p className="font-jakarta text-xs sm:text-sm text-[#504442] line-clamp-2 leading-relaxed mb-4">
+
+                      <p className="font-jakarta text-xs text-[#655d5a] line-clamp-2 leading-relaxed">
                         {product.subtitle || product.description}
                       </p>
                     </div>
 
-                    {/* Add to Order Action Button */}
-                    <div className="flex items-center gap-2 mt-auto">
+                    {/* Action Buttons */}
+                    <div className="flex items-center gap-2 pt-2 border-t border-[#f2f0ec]">
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
                           onQuickAdd(product);
                         }}
-                        className="w-full sm:w-auto self-start bg-[#271310] text-[#ffffff] font-jakarta text-xs font-semibold py-2.5 px-5 rounded-xl hover:bg-[#3e2723] transition-colors shadow-[0_4px_12px_rgba(62,39,35,0.12)] flex items-center justify-center gap-1.5 cursor-pointer active:scale-95"
+                        className="flex-1 bg-[#271310] text-[#ffffff] font-jakarta text-xs font-semibold py-2.5 px-4 rounded-xl hover:bg-[#3e2723] transition-colors shadow-xs flex items-center justify-center gap-1.5 cursor-pointer active:scale-95"
                       >
                         <span className="material-symbols-outlined text-sm">add</span>
-                        <span>Add to Order</span>
+                        <span>Quick Order</span>
                       </button>
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
                           onSelectProduct(product);
                         }}
-                        className="py-2.5 px-3 rounded-xl border border-[#d3c3c0] text-[#504442] hover:bg-[#eae8e4] text-xs font-medium font-jakarta"
-                        title="Customize details"
+                        className="py-2.5 px-3.5 rounded-xl border border-[#d3c3c0] text-[#504442] hover:bg-[#f5f3ef] hover:text-[#271310] text-xs font-semibold font-jakarta transition-colors cursor-pointer"
+                        title="Customize size, milk, sweetness"
                       >
                         Customize
                       </button>

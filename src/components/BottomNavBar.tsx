@@ -21,7 +21,7 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
   ];
 
   return (
-    <nav className="bg-[#efeeea] border-t border-[#d3c3c0]/40 shadow-[0_-4px_16px_rgba(62,39,35,0.06)] fixed bottom-0 left-0 right-0 z-40 flex justify-around items-center py-2 px-3 sm:px-6 rounded-t-2xl max-w-md mx-auto sm:max-w-xl md:max-w-2xl">
+    <nav className="md:hidden bg-[#efeeea]/95 backdrop-blur-md border-t border-[#d3c3c0]/40 shadow-[0_-4px_20px_rgba(62,39,35,0.08)] fixed bottom-0 left-0 right-0 z-40 flex justify-around items-center py-2 px-3 sm:px-6 rounded-t-2xl max-w-md mx-auto sm:max-w-xl">
       {navItems.map((item) => {
         const isActive = activeTab === item.id;
         return (
