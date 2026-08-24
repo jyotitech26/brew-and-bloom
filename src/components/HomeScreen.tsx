@@ -199,11 +199,11 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                     {/* Top Badges & Favorite Button */}
                     <div className="absolute top-3 left-3 right-3 flex items-center justify-between pointer-events-none">
                       <div className="flex items-center gap-1.5 pointer-events-auto">
-                        <span className="bg-[#271310]/85 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full font-jakarta tracking-wide">
+                        <span className="bg-black/50 backdrop-blur-md text-white text-[10px] font-semibold px-2.5 py-0.5 rounded-full font-jakarta tracking-wide">
                           {product.category}
                         </span>
                         {isFestivalFeatured && (
-                          <span className="bg-emerald-700 text-white text-[10px] font-bold px-2 py-0.5 rounded-full font-jakarta shadow-xs flex items-center gap-1 border border-emerald-500/40">
+                          <span className="bg-emerald-800/90 backdrop-blur-md text-white text-[10px] font-bold px-2 py-0.5 rounded-full font-jakarta shadow-xs flex items-center gap-1 border border-emerald-500/30">
                             <span className="material-symbols-outlined text-[12px]">celebration</span>
                             Festive
                           </span>
@@ -216,14 +216,14 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                           e.stopPropagation();
                           onToggleFavorite(product.id);
                         }}
-                        className="bg-[#ffffff]/90 hover:bg-[#ffffff] backdrop-blur-md rounded-full p-2 text-[#271310] transition-transform active:scale-90 shadow-sm pointer-events-auto cursor-pointer"
+                        className="bg-white/85 hover:bg-white backdrop-blur-md rounded-full p-2 text-[#271310] transition-transform active:scale-90 shadow-sm pointer-events-auto cursor-pointer"
                         aria-label="Toggle favorite"
                       >
                         <span
                           className={`material-symbols-outlined text-base ${
                             isFav
                               ? 'text-[#ba1a1a] material-symbols-filled'
-                              : 'text-[#504442]'
+                              : 'text-[#655d5a]'
                           }`}
                         >
                           favorite
@@ -233,7 +233,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                   </div>
 
                   {/* Card Content Details */}
-                  <div className="p-5 flex flex-col flex-1 justify-between gap-3 bg-[#fdfcfa]">
+                  <div className="p-5 flex flex-col flex-1 justify-between gap-3 bg-[#ffffff]">
                     <div>
                       <div className="flex justify-between items-start gap-2 mb-1">
                         <h4 className="font-literata text-lg font-bold text-[#271310] group-hover:text-[#655d5a] transition-colors leading-snug">
@@ -251,13 +251,13 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                         </div>
                       </div>
 
-                      <p className="font-jakarta text-xs text-[#655d5a] line-clamp-2 leading-relaxed">
+                      <p className="font-jakarta text-xs text-[#786b68] line-clamp-2 leading-relaxed">
                         {product.subtitle || product.description}
                       </p>
                     </div>
 
-                    {/* Action Buttons */}
-                    <div className="flex items-center gap-2 pt-2 border-t border-[#f2f0ec]">
+                    {/* Elegant & Balanced Action Buttons */}
+                    <div className="flex items-center gap-2 pt-2 border-t border-[#f4f1ed]">
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
@@ -269,9 +269,11 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                             setRecentlyAddedProduct(product);
                           }
                         }}
-                        className="flex-1 bg-[#271310] hover:bg-[#3e2723] text-[#ffffff] font-jakarta text-xs font-semibold py-2.5 px-4 rounded-xl transition-all shadow-xs flex items-center justify-center gap-1.5 cursor-pointer active:scale-95"
+                        className="group/btn flex-1 bg-[#f4eee9] hover:bg-[#271310] text-[#3e2723] hover:text-[#ffffff] border border-[#e4dacf] hover:border-[#271310] font-jakarta text-xs font-bold py-2.5 px-3.5 rounded-xl transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 shadow-2xs"
                       >
-                        <span className="material-symbols-outlined text-sm">flash_on</span>
+                        <span className="material-symbols-outlined text-sm text-[#827472] group-hover/btn:text-white transition-colors">
+                          shopping_bag
+                        </span>
                         <span>Quick Order</span>
                       </button>
                       <button
@@ -279,7 +281,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                           e.stopPropagation();
                           onSelectProduct(product);
                         }}
-                        className="py-2.5 px-3.5 rounded-xl border border-[#d3c3c0] text-[#504442] hover:bg-[#f5f3ef] hover:text-[#271310] text-xs font-semibold font-jakarta transition-colors cursor-pointer"
+                        className="py-2.5 px-3.5 rounded-xl text-[#786b68] hover:text-[#271310] hover:bg-[#f4eee9] border border-[#ded7cf] hover:border-[#c8bfb5] text-xs font-semibold font-jakarta transition-all duration-200 cursor-pointer"
                         title="Customize size, milk, sweetness"
                       >
                         Customize
