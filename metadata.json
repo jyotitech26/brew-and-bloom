@@ -2,5 +2,7 @@
   "name": "Brew & Bloom",
   "description": "Artisanal coffee and botanical brew boutique ordering experience featuring custom drinks, cart management, rewards, and checkout.",
   "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }
