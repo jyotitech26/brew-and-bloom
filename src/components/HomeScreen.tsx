@@ -12,6 +12,7 @@ interface HomeScreenProps {
   appliedPromoCode?: string;
   onSelectProduct: (product: ProductItem) => void;
   onQuickAdd: (product: ProductItem) => void;
+  onQuickOrder?: (product: ProductItem) => void;
   onOpenCart?: () => void;
   onToggleFavorite: (productId: string) => void;
   favoriteIds: string[];
@@ -26,6 +27,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   appliedPromoCode,
   onSelectProduct,
   onQuickAdd,
+  onQuickOrder,
   onOpenCart,
   onToggleFavorite,
   favoriteIds,
@@ -259,26 +261,18 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          onQuickAdd(product);
-                          setAddedButtonId(product.id);
-                          setRecentlyAddedProduct(product);
-                          setTimeout(() => {
-                            setAddedButtonId((prev) => (prev === product.id ? null : prev));
-                          }, 2000);
-                          setTimeout(() => {
-                            setRecentlyAddedProduct((prev) => (prev?.id === product.id ? null : prev));
-                          }, 4000);
+                          if (onQuickOrder) {
+                            onQuickOrder(product);
+                          } else {
+                            onQuickAdd(product);
+                            setAddedButtonId(product.id);
+                            setRecentlyAddedProduct(product);
+                          }
                         }}
-                        className={`flex-1 font-jakarta text-xs font-semibold py-2.5 px-4 rounded-xl transition-all shadow-xs flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 ${
-                          addedButtonId === product.id
-                            ? 'bg-emerald-700 text-white'
-                            : 'bg-[#271310] text-[#ffffff] hover:bg-[#3e2723]'
-                        }`}
+                        className="flex-1 bg-[#271310] hover:bg-[#3e2723] text-[#ffffff] font-jakarta text-xs font-semibold py-2.5 px-4 rounded-xl transition-all shadow-xs flex items-center justify-center gap-1.5 cursor-pointer active:scale-95"
                       >
-                        <span className="material-symbols-outlined text-sm">
-                          {addedButtonId === product.id ? 'check' : 'add'}
-                        </span>
-                        <span>{addedButtonId === product.id ? 'Added!' : 'Quick Order'}</span>
+                        <span className="material-symbols-outlined text-sm">flash_on</span>
+                        <span>Quick Order</span>
                       </button>
                       <button
                         onClick={(e) => {

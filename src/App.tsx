@@ -200,6 +200,12 @@ export default function App() {
     });
   };
 
+  const handleQuickOrder = (product: ProductItem) => {
+    handleQuickAdd(product);
+    setSelectedProduct(null);
+    setActiveTab('order');
+  };
+
   const handleUpdateQuantity = (id: string, delta: number) => {
     setCartItems((prev) =>
       prev
@@ -314,6 +320,7 @@ export default function App() {
             appliedPromoCode={appliedPromoCode}
             onSelectProduct={(p) => setSelectedProduct(p)}
             onQuickAdd={handleQuickAdd}
+            onQuickOrder={handleQuickOrder}
             onOpenCart={() => {
               setActiveTab('order');
               setSelectedProduct(null);
